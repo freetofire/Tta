@@ -1,29 +1,48 @@
-// ডেমো ডাটাবেজ (Vercel সার্ভার restart হলে reset হবে)
-let users = {};
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+
+// Firebase config (আপনার প্রজেক্টের থেকে কপি করতে হবে)
+const firebaseConfig = {
+  apiKey: "AIzaSyB2UyrZZ5yu9N4EJLELXBkcLRYe6OA4IJM",
+  authDomain: "tta-mo.firebaseapp.com",
+  projectId: "tta-mo",
+  storageBucket: "tta-mo.firebasestorage.app",
+  messagingSenderId: "768846766181",
+  appId: "1:768846766181:web:a2c2af74b6e3c087b4268c"
+};
+
+// Firebase init
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 export default async function handler(req, res) {
   const { userId } = req.query;
-
-  // Bot Token (⚠️ নিরাপদ হলে Vercel Environment Variable ব্যবহার করুন)
-  const BOT_TOKEN = "8247959997:AAEFYduLniuFlcL--G4D2z2-w0Mtj52IsOo";
 
   if (!userId) {
     return res.status(400).json({ error: "userId missing" });
   }
 
-  // যদি নতুন ইউজার হয়, তার জন্য ডিফল্ট ডেটা তৈরি করবো
-  if (!users[userId]) {
-    users[userId] = {
-      reflink: `https://t.me/Testttab_bot?start=${userId}`,
-      refcount: 0,
-      balance: 0
-    };
-  }
+  try {
+    const userRef = doc(db, "users", userId.toString());
+    const snap = await getDoc(userRef);
 
-  // ডেমো হিসেবে: রেফার কাউন্ট ১ বাড়ানো
-  users[userId].refcount += 1;
-  users[userId].balance += 200;
+    let userData;
 
-  // রেসপন্সে ডেটা পাঠানো
-  res.status(200).json(users[userId]);
+    if (snap.exists()) {
+      // পুরানো ডেটা নেবো
+      userData = snap.data();
+    } else {
+      // নতুন ইউজার হলে ডিফল্ট ডেটা সেট করবো
+      userData = {
+        reflink: `https://t.me/Testttab_bot?start=${userId}`,
+        refcount: 0,
+        balance: 0
+      };
+      await setDoc(userRef, userData);
     }
+
+    res.status(200).json(userData);
+  } catch (err) {
+    res.status(500).json({ error: "Firebase error", details: err.message });
+  }
+}
