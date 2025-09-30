@@ -2,28 +2,72 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Telegram Mini App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: block;
+      margin: 10px auto;
+      padding: 12px 20px;
+      background: #0088cc;
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      border-radius: 8px;
+      transition: 0.3s;
+      width: 80%;
+    }
+    .btn:hover {
+      background: #005f88;
+    }
+  </style>
 </head>
 <body>
-  <h2>আপনার তথ্য</h2>
-  <p>রেফারেল লিংক: <span id="reflink"></span></p>
-  <p>রেফার কাউন্ট: <span id="refcount"></span></p>
-  <p>ব্যালেন্স: <span id="balance"></span></p>
+  <h2>Telegram Mini App</h2>
+
+  <!-- User Info -->
+  <div class="card">
+    <p><strong>রেফারেল লিংক:</strong> <span id="reflink">লোড হচ্ছে...</span></p>
+    <p><strong>রেফার কাউন্ট:</strong> <span id="refcount">0</span></p>
+    <p><strong>ব্যালেন্স:</strong> <span id="balance">৳0</span></p>
+  </div>
+
+  <!-- Buttons -->
+  <a class="btn" href="https://t.me/Testttab_bot?start=start" target="_blank">▶️ বট স্টার্ট করুন</a>
+  <a class="btn" href="https://t.me/your_admin_username" target="_blank">📩 এডমিনকে রিকোয়েস্ট পাঠান</a>
 
   <script>
-    let tg = window.Telegram.WebApp || null;
-    let userId = tg ? tg.initDataUnsafe?.user?.id : "demo123";
+    // Telegram WebApp থেকে userId আনা
+    let tg = window.Telegram.WebApp;
+    let userId = tg.initDataUnsafe?.user?.id || "guest";
 
+    // API থেকে ডেটা ফেচ করা
     fetch(`/api/user?userId=${userId}`)
       .then(res => res.json())
       .then(data => {
         document.getElementById("reflink").innerText = data.reflink;
         document.getElementById("refcount").innerText = data.refcount;
         document.getElementById("balance").innerText = "৳" + data.balance;
-        console.log("Bot Info:", data.bot);
       })
-      .catch(err => console.error("API Error:", err));
+      .catch(err => {
+        console.error("API Error:", err);
+      });
   </script>
 </body>
 </html>
