@@ -1,12 +1,29 @@
-<script>
-  let tg = window.Telegram.WebApp;
-  let userId = tg.initDataUnsafe.user.id;  // ইউজারের টেলিগ্রাম আইডি
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Mini App</title>
+</head>
+<body>
+  <h2>আপনার তথ্য</h2>
+  <p>রেফারেল লিংক: <span id="reflink"></span></p>
+  <p>রেফার কাউন্ট: <span id="refcount"></span></p>
+  <p>ব্যালেন্স: <span id="balance"></span></p>
 
-  fetch(`/api/user?userId=${userId}`)
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("reflink").innerText = data.reflink;
-      document.getElementById("refcount").innerText = data.refcount;
-      document.getElementById("balance").innerText = "৳" + data.balance;
-    });
-</script>
+  <script>
+    let tg = window.Telegram.WebApp || null;
+    let userId = tg ? tg.initDataUnsafe?.user?.id : "demo123";
+
+    fetch(`/api/user?userId=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("reflink").innerText = data.reflink;
+        document.getElementById("refcount").innerText = data.refcount;
+        document.getElementById("balance").innerText = "৳" + data.balance;
+        console.log("Bot Info:", data.bot);
+      })
+      .catch(err => console.error("API Error:", err));
+  </script>
+</body>
+</html>
