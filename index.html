@@ -1,0 +1,12 @@
+<script>
+  let tg = window.Telegram.WebApp;
+  let userId = tg.initDataUnsafe.user.id;  // ইউজারের টেলিগ্রাম আইডি
+
+  fetch(`/api/user?userId=${userId}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("reflink").innerText = data.reflink;
+      document.getElementById("refcount").innerText = data.refcount;
+      document.getElementById("balance").innerText = "৳" + data.balance;
+    });
+</script>
